@@ -17,6 +17,8 @@ library(stringr)
 library(visreg)
 library(scales)
 library(purrr)
+library(ggplot2)
+library(RColorBrewer)
 ```
 
 ```{r}
@@ -502,3 +504,122 @@ ggplot(plotd, aes(x = factor(GASTO_CUB,
   theme(legend.position = "none")
 ```
 
+```{r}
+g3 <- ggplot(plotd, aes(x = factor(NEC_AIRLIB,
+                                levels = c("1", "0"),
+                                labels = c("Si", "No")),
+               fill = factor(SEMESTRE,
+                             levels = c("1", "3", "5", "9"),
+                             labels = c("PRIMERO", "TERCERO", "QUINTO", "NOVENO")))) + 
+  geom_bar(position = "dodge") + 
+  labs(fill = "SEMESTRE") + scale_fill_manual(values=brewer.pal(n = 4, name = "Set1"))
+g3 + labs(title = "USO DEL CUBREBOCAS EN ESPACIOS LIBRES",
+          subtitle = "Agrupados por semestre",
+          x = "",
+          y = "Frecuencia")
+```
+```{r}
+g3 <- ggplot(plotd, aes(x = factor(NEC_AIRLIB,
+                                levels = c("1", "0"),
+                                labels = c("Si", "No")),
+               fill = factor(SEXO,
+                             levels = c("0", "1"),
+                             labels = c("HOMBRE", "MUJER")))) + 
+  geom_bar(position = "dodge") + 
+  labs(fill = "SEXO") + scale_fill_manual(values=brewer.pal(n = 4, name = "Spectral"))
+g3 + labs(title = "USO DEL CUBREBOCAS EN ESPACIOS LIBRES",
+          subtitle = "Agrupados por sexo",
+          x = "",
+          y = "Frecuencia")
+```
+```{r}
+ggplot(plotd, aes(x = factor(SEMESTRE,
+                             labels = c("Primero", "Tercero", "Quinto", "Noveno")),
+                     y = n,
+                  fill = factor(GASTO_CUB,
+                                levels = c("1", "2", "3"),
+                                labels = c("$26- $50", "$51- $75", "$76- $100")))) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_y_continuous() +
+  geom_text(aes(label = n),
+            size = 3,
+            position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Blues") + 
+  labs(y = "Frecuencia",
+       fill = "Costo",
+       x = "Semestre",
+       title = "Inversión mensual en cubrebocas") +
+  theme_minimal()
+  ```
+  ```{r}
+  plotd <- df %>%
+  group_by(NUM_DOSIS, CUB_NEC) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n / sum(n),
+         lbl = scales::percent(pct))
+         plotd <- as.data.frame(plotd)
+         ggplot(plotd, aes(x = factor(CUB_NEC,
+                             labels = c("Si", "No")),
+                     y = n,
+                  fill = factor(NUM_DOSIS,
+                                labels = c("2", "3")))) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_y_continuous() +
+  geom_text(aes(label = n),
+            size = 3,
+            position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Blues") + 
+  labs(y = "Frecuencia",
+       fill = "Dosis",
+       x = "",
+       title = "Uso del cubrebocas como medida necesaria",
+       subtitle = "Después de la aplicacion de vacunas ") +
+  theme_minimal()
+  ```
+  ```{r}
+  plotd <- df %>%
+  group_by(MUNICIPIO, NEC_AIRLIB) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n / sum(n),
+         lbl = scales::percent(pct))
+  plotd <- as.data.frame(plotd)
+  ggplot(plotd, aes(x = factor(MUNICIPIO, labels = c("Acambay", "Aculco", "Atlacomulco", "El oro", "Ixtlahuaca", "Jilotepec", "Jiquipilco", "Jocotitlan", "Polotitlán", "Morelos", "San Felipe del Progreso", "San José del Rincón ", "Temascalcingo", "Tenancingo", "Valle de Bravo", "Villa de Allende", "Villa del Carbon")),
+                  y=n,
+                  fill = factor(NEC_AIRLIB,
+                  labels = c("Si","No"))))+
+                   geom_bar(stat = "identity", position = "stack") +
+  scale_y_continuous() +
+  geom_text(aes(label = n),
+            size = 3,
+            position = position_stack(vjust = 0.5)) +
+  scale_fill_manual(values = c("cadetblue2","cadetblue4")) + 
+  labs(y = "Frecuencia",
+       fill = "RESPUESTA",
+       x = "MUNICIPIO",
+       title = "Crees necesitar cubrebocas cuando estás al aire libre") +
+  theme_minimal()+
+  coord_flip()
+  ```
+  ```{r}
+  plotd <- df %>%
+  group_by(SEMESTRE, CUB_PIEL) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n / sum(n),
+         lbl = scales::percent(pct))
+  plotd <- as.data.frame(plotd)
+  ggplot(plotd, aes(x = factor(SEMESTRE,
+                             labels = c("PRIMERO", "TERCERO","QUINTO","NOVENO")),
+                     y=n,
+               fill = factor(CUB_PIEL,
+                             levels = c("1","2"),
+                                labels = c("Si", "No")))) + 
+ geom_bar(stat = "identity", position = "dodge")+ 
+  scale_y_continuous()+
+  geom_text(aes(label = n),
+            size = 3,
+            position = position_dodge2(width = 0.8, preserve = "single", padding = 2)) + scale_fill_brewer(palette = "Blues")+
+  labs(y = "Frecuencia",
+       fill = "RESPUESTA",x = "Semestre",
+       title = "El uso de cubrebocas afecta el cuidado de tu piel")+ 
+  theme_minimal()
+  ```
