@@ -1,0 +1,504 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(readr)
+library(tidyverse)
+library(data.table)
+library(dplyr)
+library(ggridges)
+library(ggplot2)
+library(rvest)
+library(tidyr)
+library(purrr)
+library(stringr)
+library(visreg)
+library(scales)
+library(purrr)
+```
+
+```{r}
+df <- read.csv("FaceMask_ICO.csv")
+```
+
+# 1. SEXO
+
+```{r}
+plotd <- df %>%
+  group_by(SEXO) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(SEXO,
+                             labels = c("Hombre", "Mujer")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none")
+```
+
+# 2. SEMESTRE
+```{r}
+plotd <- df %>%
+  group_by(SEMESTRE) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = SEMESTRE,
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "Semestre",
+       y = "Frecuencia") + 
+  theme(legend.position = "none") 
+```
+# 3. EDAD
+```{r}
+plotd <- df %>%
+  group_by(EDAD) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(EDAD),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "EDAD",
+       y = "Frecuencia") + 
+  theme(legend.position = "none")
+```
+
+# 4. MUNICIPIO
+```{r}
+plotd <- df %>%
+  group_by(MUNICIPIO) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+plotd[
+  order(plotd[,2]),
+]
+plotd <- as.data.frame(plotd)
+```
+
+```{r}
+plotd <- df %>%
+  count(MUNICIPIO)
+```
+
+```{r}
+ggplot(plotd, aes(x = reorder(factor(MUNICIPIO,
+                                     levels = c("1", "3", "14", "64", "42", "45", "47", "48", "71", "56", "74", "124", "85", "88", "110", "111", "112"),
+                                     labels = c("Acambay", "Aculco", "Atlacomulco", "El oro", "Ixtlahuaca", "Jilotepec", "Jiquipilco", "Jocotitlan", "Polotitlán", "Morelos", "San Felipe del Progreso", "San José del Rincón ", "Temascalcingo", "Tenancingo", "Valle de Bravo", "Villa de Allende", "Villa del Carbon")), n),
+                  y = n)) + 
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = n),vjust = 0.4, hjust = -0.3) +
+  labs(y = "Frecuencia",
+       x = "Municipio") + 
+  coord_flip()
+```
+# ¿Cómo evaluaría su nivel de conocimiento respecto a la prevención de la propagación del coronavirus?
+```{r}
+plotd <- df %>%
+  group_by(CONOC_PREVENCION_COVID) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(CONOC_PREVENCION_COVID,
+                             labels = c("Escaso", "Suficiente", "Experto")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none") 
+```
+
+# ¿Consideras el Centro Universitario un espacio libre del virus de COVID-19?
+```{r}
+plotd <- df %>%
+  group_by(LIBRE_COVID) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(LIBRE_COVID,
+                             labels = c("Si", "No")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none") 
+```
+# ¿Cuenta con alguna dosis de vacuna contra el COVID-19?
+
+
+```{r}
+plotd <- df %>%
+  group_by(DOSIS_VACUNA) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(DOSIS_VACUNA,
+                             labels = c("No", "Si")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none") 
+```
+
+# ¿Cuántas dosis de la vacuna contra el COVID-19 recibió?
+
+```{r}
+plotd <- df %>%
+  group_by(NUM_DOSIS) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(NUM_DOSIS,
+                             labels = c("2", "3")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none") 
+```
+
+# ¿Qué vacuna se aplicó?
+```{r}
+plotd <- df %>%
+  group_by(TIPO_VACUNA) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+# ¿Consideras que la vacuna te protege de contagiarte del virus de COVID-19?
+```{r}
+plotd <- df %>%
+  group_by(VACUNA_PROTEGE) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(VACUNA_PROTEGE,
+                             labels = c("Si", "No")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none")
+```
+
+# ¿Con que frecuencia usaría el cubrebocas en lugares públicos después de haberse aplicado alguna dosis de vacuna?
+
+```{r}
+plotd <- df %>%
+  group_by(USO_CUB_PUBDVAC) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(USO_CUB_PUBDVAC,
+                             labels = c("Nunca", "Casi Nunca", "Ocasionalmente", "Todos los dias", "")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none")
+```
+
+# ¿Qué porcentaje crees que te afecta el COVID después de las vacunas?
+
+```{r}
+plotd <- df %>%
+  group_by(EFECTO_COVID_DVAC) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(EFECTO_COVID_DVAC,
+                             levels = c("0", "1", "2", "3"),
+                             labels = c("0%-25%", "26%-50%", "51%-75%", "76%-100%")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none")
+```
+
+# ¿Por qué razón usa el cubrebocas?
+```{r}
+plotd <- df %>%
+  group_by(RAZON_USO) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(RAZON_USO,
+                             labels = c("Convicción", "Obligación")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none")
+```
+
+# ¿Con qué frecuencia usa el cubrebocas en lugares cerrados y habitados?
+```{r}
+plotd <- df %>%
+  group_by(USO_LUGCERR_HAB) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(USO_LUGCERR_HAB,
+                             labels = c("Ocasionalmente", "Casi siempre", "Siempre")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none")
+```
+
+# ¿Consideras el uso de cubrebocas como una medida necesaria para disminuir los contagios de COVID-19 dentro de la universidad
+```{r}
+plotd <- df %>%
+  group_by(CUB_NEC) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(CUB_NEC,
+                             labels = c("Si", "No")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none")
+```
+
+# ¿Crees necesitar cubrebocas cuando estas al aire libre?
+```{r}
+plotd <- df %>%
+  group_by(NEC_AIRLIB) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(NEC_AIRLIB,
+                             labels = c("Si", "No")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none")
+```
+# ¿Qué tipo de cubrebocas usas?
+```{r}
+plotd <- df %>%
+  group_by(TIPO_CUB) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(TIPO_CUB,
+                             labels = c("Desechable", "Reutilizable")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none")
+```
+
+# ¿Cuál es el motivo por el que rechazarías el cubrebocas?
+```{r}
+plotd <- df %>%
+  group_by(RECH_CUB) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(RECH_CUB,
+                             labels = c("Porque ya te vacunaste ", "Porque no te gusta usarlo", "Por cuestiones respiratorias")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none")
+```
+
+# ¿El uso de cubrebocas afecta el cuidado de tu piel? (como por ejemplo la nariz, boca, mejillas: acné o alergia).
+```{r}
+plotd <- df %>%
+  group_by(CUB_PIEL) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(CUB_PIEL,
+                             labels = c("Si", "No")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none")
+```
+
+# ¿Piensas que el uso obligatorio del cubrebocas está bien después de vacunarse?
+```{r}
+plotd <- df %>%
+  group_by(PIENSA_NCUB_DVAC) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(PIENSA_NCUB_DVAC,
+                             labels = c("Si", "No")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none")
+```
+
+# ¿Cuántos cubrebocas utilizas a la semana?
+```{r}
+plotd <- df %>%
+  group_by(NUM_CUBRE_SEM) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(NUM_CUBRE_SEM,
+                             labels = c("1 a 2", "3 a 5", "6 a 10", "11 o mas")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none")
+```
+
+# ¿Cuánto dinero gastas al mes por cubrebocas?
+```{r}
+plotd <- df %>%
+  group_by(GASTO_CUB) %>%
+  summarize(n = n()) %>%
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+```
+
+```{r}
+ggplot(plotd, aes(x = factor(GASTO_CUB,
+                             labels = c("$26- $50", "$51- $75", "$76- $100")),
+                  y = n)) + 
+  geom_bar(stat = "identity") + 
+  scale_color_grey() + 
+  geom_text(aes(label = n), vjust = -0.3) + 
+  labs(fill = " ",
+       x = "",
+       y = "Frecuencia") + 
+  theme(legend.position = "none")
+```
+
